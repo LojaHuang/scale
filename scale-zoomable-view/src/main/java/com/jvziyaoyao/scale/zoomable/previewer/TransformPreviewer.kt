@@ -36,6 +36,7 @@ import com.jvziyaoyao.scale.zoomable.pager.DEFAULT_ITEM_SPACE
 import com.jvziyaoyao.scale.zoomable.pager.PagerGestureScope
 import com.jvziyaoyao.scale.zoomable.pager.PagerZoomablePolicyScope
 import com.jvziyaoyao.scale.zoomable.pager.SupportedPagerState
+import com.jvziyaoyao.scale.zoomable.zoomable.zeroOne
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -142,7 +143,7 @@ open class TransformPreviewerState(
                 // 开启viewer图层
                 animateContainerVisibleState = MutableTransitionState(true)
 
-                val displaySize = if (intrinsicSize != null && intrinsicSize!!.isSpecified) {
+                val displaySize = if (intrinsicSize != null && intrinsicSize!= Size.Unspecified && intrinsicSize!!.isSpecified) {
                     getDisplaySize(intrinsicSize!!, containerSize.value)
                 } else {
                     getDisplaySize(containerSize.value, containerSize.value)
@@ -226,31 +227,35 @@ open class TransformPreviewerState(
         // 同步动画开始的位置
         val itemState = findTransformItemByIndex(index)
         if (itemState != null && itemState.blockSize != IntSize.Zero) {
-            itemState.apply {
-                stateCloseStart()
+            try {
+                itemState.apply {
+                    stateCloseStart()
 
-                val displaySize = getDisplaySize(intrinsicSize ?: Size.Zero, containerSize.value)
-                val displayX = (containerSize.value.width - displaySize.width).div(2)
-                val displayY = (containerSize.value.height - displaySize.height).div(2)
-                var targetSize = displaySize
-                var targetX = displayX
-                var targetY = displayY
-                zoomableViewState.value?.apply {
-                    targetSize = displaySize * scale.value
-                    targetX =
-                        offsetX.value + displayX - (targetSize.width - displaySize.width).div(2)
-                    targetY =
-                        offsetY.value + displayY - (targetSize.height - displaySize.height).div(2)
+                    val displaySize = getDisplaySize(intrinsicSize ?: Size.Zero, containerSize.value)
+                    val displayX = (containerSize.value.width - displaySize.width).div(2)
+                    val displayY = (containerSize.value.height - displaySize.height).div(2)
+                    var targetSize = displaySize
+                    var targetX = displayX
+                    var targetY = displayY
+                    zoomableViewState.value?.apply {
+                        targetSize = displaySize * scale.value
+                        targetX =
+                            offsetX.value + displayX - (targetSize.width - displaySize.width).div(2)
+                        targetY =
+                            offsetY.value + displayY - (targetSize.height - displaySize.height).div(2)
+                    }
+                    displayWidth.snapTo(targetSize.width)
+                    displayHeight.snapTo(targetSize.height)
+                    displayOffsetX.snapTo(targetX)
+                    displayOffsetY.snapTo(targetY)
+
+                    // 启动关闭
+                    exitFromCurrentState(itemState, animationSpec)
+
+                    stateCloseEnd()
                 }
-                displayWidth.snapTo(targetSize.width)
-                displayHeight.snapTo(targetSize.height)
-                displayOffsetX.snapTo(targetX)
-                displayOffsetY.snapTo(targetY)
-
-                // 启动关闭
-                exitFromCurrentState(itemState, animationSpec)
-
-                stateCloseEnd()
+            } catch (ignore: Exception) {
+                close()
             }
         } else {
             close()
@@ -358,8 +363,8 @@ fun TransformContentLayer(
                     contentSize = Size(displayWidth.value, displayHeight.value),
                 )
                 if (fitSize.isSpecified) {
-                    val targetScaleX = displayWidth.value.div(fitSize.width)
-                    val targetScaleY = displayHeight.value.div(fitSize.height)
+                    val targetScaleX = displayWidth.value.div(fitSize.width.zeroOne())
+                    val targetScaleY = displayHeight.value.div(fitSize.height.zeroOne())
                     val actionColor = Color.Green
                     Box(
                         modifier = Modifier

@@ -13,6 +13,7 @@ import com.jvziyaoyao.scale.zoomable.previewer.DEFAULT_SOFT_ANIMATION_SPEC
 import com.jvziyaoyao.scale.zoomable.previewer.ItemStateMap
 import com.jvziyaoyao.scale.zoomable.previewer.TransformItemState
 import com.jvziyaoyao.scale.zoomable.previewer.VerticalDragType
+import com.jvziyaoyao.scale.zoomable.zoomable.zeroOne
 import com.origeek.imageViewer.gallery.ImageGalleryState
 import com.origeek.imageViewer.viewer.commonDeprecatedText
 import kotlinx.coroutines.CoroutineScope
@@ -191,7 +192,7 @@ open class PreviewerVerticalDragState(
                     if (vOrientationDown == true || verticalDragType == VerticalDragType.UpAndDown) {
                         val offsetY = change.position.y - vStartOffset!!.y
                         val offsetX = change.position.x - vStartOffset!!.x
-                        val containerHeight = viewerContainerState!!.containerSize.height
+                        val containerHeight = viewerContainerState?.containerSize?.height.zeroOne()
                         val scale = (containerHeight - offsetY.absoluteValue).div(
                             containerHeight
                         )

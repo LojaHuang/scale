@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -29,6 +30,7 @@ import com.jvziyaoyao.scale.zoomable.pager.DEFAULT_ITEM_SPACE
 import com.jvziyaoyao.scale.zoomable.pager.PagerGestureScope
 import com.jvziyaoyao.scale.zoomable.pager.PagerZoomablePolicyScope
 import com.jvziyaoyao.scale.zoomable.pager.SupportedPagerState
+import com.jvziyaoyao.scale.zoomable.zoomable.zeroOne
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -165,7 +167,7 @@ open class DraggablePreviewerState(
                     if (orientationDown == true || verticalDragType == VerticalDragType.UpAndDown) {
                         val offsetY = change.position.y - startOffset!!.y
                         val offsetX = change.position.x - startOffset!!.x
-                        val containerHeight = containerSize.value.height
+                        val containerHeight = containerSize.value.height.zeroOne()
                         val scale = (containerHeight - offsetY.absoluteValue).div(
                             containerHeight
                         )
@@ -196,7 +198,7 @@ open class DraggablePreviewerState(
 
         draggableContainerState.apply {
             val displaySize =
-                if (itemState.intrinsicSize != null && itemState.intrinsicSize!!.isSpecified) {
+                if (itemState.intrinsicSize != null && itemState.intrinsicSize != Size.Unspecified && itemState.intrinsicSize!!.isSpecified) {
                     getDisplaySize(itemState.intrinsicSize!!, containerSize.value)
                 } else {
                     getDisplaySize(containerSize.value, containerSize.value)

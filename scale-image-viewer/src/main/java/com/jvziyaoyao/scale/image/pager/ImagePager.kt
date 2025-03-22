@@ -83,10 +83,10 @@ typealias ProceedPresentation = @Composable PagerZoomablePolicyScope.(
  */
 val defaultProceedPresentation: ProceedPresentation = { model, size, processor, imageLoading ->
     // TODO 这里是否要添加渐变动画?
-    if (model != null && model is AnyComposable && size == null) {
+    if (model != null && model is AnyComposable && (size == null || size == Size.Unspecified)) {
         model.composable.invoke()
         true
-    } else if (model != null && size != null) {
+    } else if (model != null && size != null && size != Size.Unspecified) {
         ZoomablePolicy(intrinsicSize = size) {
             processor.Deploy(model = model, state = it)
         }
