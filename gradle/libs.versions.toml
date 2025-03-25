@@ -53,4 +53,4 @@ android-application = { id = "com.android.application", version.ref = "androidGr
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 jetbrains-kotlin = { id = "org.jetbrains.kotlin.android", version = "1.9.0" }
 jetbrains-dokka = { id = "org.jetbrains.dokka", version = "1.9.20" }
-vanniktech-maven-publish = { id = "com.vanniktech.maven.publish", version = "0.28.0" }
+vanniktech-maven-publish = { id = "com.vanniktech.maven.publish", version = "0.31.0-rc2" }

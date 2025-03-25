@@ -1,11 +1,14 @@
 package com.jvziyaoyao.scale.image.previewer
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -23,6 +26,7 @@ import com.jvziyaoyao.scale.zoomable.previewer.DEFAULT_PREVIEWER_EXIT_TRANSITION
 import com.jvziyaoyao.scale.zoomable.previewer.Previewer
 import com.jvziyaoyao.scale.zoomable.previewer.PreviewerState
 import com.jvziyaoyao.scale.zoomable.previewer.TransformLayerScope
+import kotlinx.coroutines.launch
 
 /**
  * 默认的容器背景
@@ -73,6 +77,17 @@ fun ImagePreviewer(
     pageDecoration: @Composable (page: Int, innerPage: @Composable () -> Boolean) -> Boolean
     = { _, innerPage -> innerPage() },
 ) {
+    val scope = rememberCoroutineScope()
+    LaunchedEffect(state.pagerState.pageCount) {
+        if (state.pagerState.pageCount <= 0 && (state.canClose || state.animating)) {
+            state.close()
+        }
+    }
+    if (state.canClose || state.animating) BackHandler {
+        if (state.canClose) scope.launch {
+            state.exitTransform()
+        }
+    }
     Previewer(
         modifier = modifier,
         state = state,

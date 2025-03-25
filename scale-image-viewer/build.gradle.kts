@@ -1,5 +1,6 @@
 import scale.compileSdk
 import scale.minSdk
+import scale.versionName
 
 plugins {
     alias(libs.plugins.android.library)
@@ -7,6 +8,8 @@ plugins {
     alias(libs.plugins.jetbrains.dokka)
     alias(libs.plugins.vanniktech.maven.publish)
 }
+
+val aarName = "scale-image-viewer-${project.versionName}.aar"
 
 android {
     namespace = "com.jvziyaoyao.scale.image"
@@ -46,10 +49,35 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    libraryVariants.all {
+        val variant = this
+        variant.outputs
+            .map { it as com.android.build.gradle.internal.api.BaseVariantOutputImpl }
+            .forEach { output ->
+                output.outputFileName = aarName
+            }
+    }
+}
+
+afterEvaluate {
+    tasks.named("assembleRelease") {
+        finalizedBy("copyReleaseAar")
+    }
+}
+
+tasks.register<Copy>("copyReleaseAar") {
+    dependsOn("assembleRelease")
+    val aarFile = file("build/outputs/aar/${aarName}")
+    val targetDir = file("/Users/loja/Documents/Projects/chat/nfchat/client/libs/")
+    from(aarFile)
+    into(targetDir)
+    doLast{
+        println("copy success $aarName")
+    }
 }
 
 dependencies {
-
     api(project(":scale-zoomable-view"))
     implementation(libs.androidx.exif)
     implementation(libs.core.ktx)
