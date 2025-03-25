@@ -1,4 +1,5 @@
 import scale.compileSdk
+import scale.libTargetDir
 import scale.minSdk
 import scale.versionName
 
@@ -69,7 +70,7 @@ afterEvaluate {
 tasks.register<Copy>("copyReleaseAar") {
     dependsOn("assembleRelease")
     val aarFile = file("build/outputs/aar/${aarName}")
-    val targetDir = file("/Users/loja/Documents/Projects/chat/nfchat/client/libs/")
+    val targetDir = file(project.libTargetDir)
     from(aarFile)
     into(targetDir)
     doLast{

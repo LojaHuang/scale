@@ -13,3 +13,6 @@ val Project.compileSdk: Int
 
 val Project.versionName: String
     get() = project.properties["VERSION_NAME"].toString()
+
+val Project.libTargetDir: String
+    get() = project.properties["LIB_TARGET_DIR"].toString()

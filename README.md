@@ -242,3 +242,10 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
+个人配置：
+gradle.properties
+VERSION_NAME 版本号，原作者的版本号.nfxxx
+LIB_TARGET_DIR 需要拷贝的目标目录
+当前用到的库有下面两个，可以一起打包
+./gradlew :scale-image-viewer:assembleRelease :scale-zoomable-view:assembleRelease
