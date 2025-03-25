@@ -1,12 +1,14 @@
+import org.gradle.internal.extensions.core.extra
 import scale.compileSdk
 import scale.minSdk
 import scale.versionName
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin)
     alias(libs.plugins.jetbrains.dokka)
-    alias(libs.plugins.vanniktech.maven.publish)
+    id("maven-publish")
 }
 
 val aarName = "scale-image-viewer-${project.versionName}.aar"
@@ -58,22 +60,37 @@ android {
                 output.outputFileName = aarName
             }
     }
-}
-
-afterEvaluate {
-    tasks.named("assembleRelease") {
-        finalizedBy("copyReleaseAar")
+    publishing {
+        singleVariant("release"){
+            withSourcesJar()
+            withJavadocJar()
+        }
     }
 }
 
-tasks.register<Copy>("copyReleaseAar") {
-    dependsOn("assembleRelease")
-    val aarFile = file("build/outputs/aar/${aarName}")
-    val targetDir = file("/Users/loja/Documents/Projects/chat/nfchat/client/libs/")
-    from(aarFile)
-    into(targetDir)
-    doLast{
-        println("copy success $aarName")
+publishing{
+    repositories{
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/lojahuang/scale")
+            credentials {
+                username = System.getenv("GPR_USER")
+                password = System.getenv("GPR_KEY")
+            }
+        }
+    }
+    publications {
+        register<MavenPublication>("release") {
+            // 配置信息，使用: classpath("groupId:artifactId:version") (不能有空格)
+            groupId = "com.lojahuang"
+            artifactId = "scale-image-viewer"
+            version = project.versionName
+
+            // 这条要加上，不然不会包含代码文件
+            afterEvaluate {
+                from(components["release"])
+            }
+        }
     }
 }
 
