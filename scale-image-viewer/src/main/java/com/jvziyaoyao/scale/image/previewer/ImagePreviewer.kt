@@ -74,6 +74,7 @@ fun ImagePreviewer(
     previewerLayer: TransformLayerScope = TransformLayerScope(
         background = defaultPreviewBackground
     ),
+    backEnabled: Boolean = true,
     pageDecoration: @Composable (page: Int, innerPage: @Composable () -> Boolean) -> Boolean
     = { _, innerPage -> innerPage() },
 ) {
@@ -83,11 +84,15 @@ fun ImagePreviewer(
             state.close()
         }
     }
-    if (state.canClose || state.animating) BackHandler {
-        if (state.canClose) scope.launch {
-            state.exitTransform()
+    BackHandler(enabled = backEnabled && (state.visible || state.animating || state.visibleTarget == true)) {
+        scope.launch {
+            if (!state.animating) {
+                if (state.canClose) state.exitTransform()
+                else state.close()
+            }
         }
     }
+
     Previewer(
         modifier = modifier,
         state = state,
