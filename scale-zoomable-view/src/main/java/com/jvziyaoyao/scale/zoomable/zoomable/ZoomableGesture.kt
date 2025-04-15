@@ -147,7 +147,7 @@ fun ZoomableViewState.onGesture(
     }
 
     var checkRotate = rotate
-    var checkZoom = zoom
+    var checkZoom = zoom.ensureScale()
     // 如果是双指的情况下，手指距离小于一定值时，缩放和旋转的值会很离谱，所以在这种极端情况下就不要处理缩放和旋转了
     if (event.changes.size == 2) {
         val fingerDistanceOffset =
@@ -168,7 +168,7 @@ fun ZoomableViewState.onGesture(
     val currentScale = scale.value
     val currentRotation = rotation.value
 
-    var nextScale = currentScale.times(checkZoom)
+    var nextScale = currentScale.times(checkZoom).ensureScale()
     // 检查最小放大倍率
     if (nextScale < MIN_SCALE) nextScale = MIN_SCALE
 

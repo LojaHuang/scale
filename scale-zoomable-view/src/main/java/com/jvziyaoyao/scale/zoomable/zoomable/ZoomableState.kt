@@ -392,3 +392,5 @@ fun rememberZoomableState(
 fun Int?.zeroOne(): Int = if (this == null || this == 0) 1 else this
 fun Float?.zeroOne(): Float = if (this == null || this == 0f) 1f else this
 fun Long?.zeroOne(): Long = if (this == null || this == 0L) 1L else this
+
+fun Float.ensureScale() = this.coerceIn(0f, 10f)

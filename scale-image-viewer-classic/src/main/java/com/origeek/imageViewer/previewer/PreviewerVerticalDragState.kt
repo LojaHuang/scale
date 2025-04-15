@@ -13,6 +13,7 @@ import com.jvziyaoyao.scale.zoomable.previewer.DEFAULT_SOFT_ANIMATION_SPEC
 import com.jvziyaoyao.scale.zoomable.previewer.ItemStateMap
 import com.jvziyaoyao.scale.zoomable.previewer.TransformItemState
 import com.jvziyaoyao.scale.zoomable.previewer.VerticalDragType
+import com.jvziyaoyao.scale.zoomable.zoomable.ensureScale
 import com.jvziyaoyao.scale.zoomable.zoomable.zeroOne
 import com.origeek.imageViewer.gallery.ImageGalleryState
 import com.origeek.imageViewer.viewer.commonDeprecatedText
@@ -195,7 +196,7 @@ open class PreviewerVerticalDragState(
                         val containerHeight = viewerContainerState?.containerSize?.height.zeroOne()
                         val scale = (containerHeight - offsetY.absoluteValue).div(
                             containerHeight
-                        )
+                        ).ensureScale()
                         scope.launch {
                             uiAlpha.snapTo(scale)
                             viewerContainerState?.offsetX?.snapTo(offsetX)

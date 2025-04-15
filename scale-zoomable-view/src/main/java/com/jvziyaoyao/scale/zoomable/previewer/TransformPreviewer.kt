@@ -36,6 +36,7 @@ import com.jvziyaoyao.scale.zoomable.pager.DEFAULT_ITEM_SPACE
 import com.jvziyaoyao.scale.zoomable.pager.PagerGestureScope
 import com.jvziyaoyao.scale.zoomable.pager.PagerZoomablePolicyScope
 import com.jvziyaoyao.scale.zoomable.pager.SupportedPagerState
+import com.jvziyaoyao.scale.zoomable.zoomable.ensureScale
 import com.jvziyaoyao.scale.zoomable.zoomable.zeroOne
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -363,8 +364,8 @@ fun TransformContentLayer(
                     contentSize = Size(displayWidth.value, displayHeight.value),
                 )
                 if (fitSize.isSpecified) {
-                    val targetScaleX = displayWidth.value.div(fitSize.width.zeroOne())
-                    val targetScaleY = displayHeight.value.div(fitSize.height.zeroOne())
+                    val targetScaleX = displayWidth.value.div(fitSize.width.zeroOne()).ensureScale()
+                    val targetScaleY = displayHeight.value.div(fitSize.height.zeroOne()).ensureScale()
                     val actionColor = Color.Green
                     Box(
                         modifier = Modifier

@@ -30,6 +30,7 @@ import com.jvziyaoyao.scale.zoomable.pager.DEFAULT_ITEM_SPACE
 import com.jvziyaoyao.scale.zoomable.pager.PagerGestureScope
 import com.jvziyaoyao.scale.zoomable.pager.PagerZoomablePolicyScope
 import com.jvziyaoyao.scale.zoomable.pager.SupportedPagerState
+import com.jvziyaoyao.scale.zoomable.zoomable.ensureScale
 import com.jvziyaoyao.scale.zoomable.zoomable.zeroOne
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
@@ -170,7 +171,7 @@ open class DraggablePreviewerState(
                         val containerHeight = containerSize.value.height.zeroOne()
                         val scale = (containerHeight - offsetY.absoluteValue).div(
                             containerHeight
-                        )
+                        ).ensureScale()
                         scope.launch {
                             decorationAlpha.snapTo(scale)
                             draggableContainerState.offsetX.snapTo(offsetX)

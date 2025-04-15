@@ -29,6 +29,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
+import com.jvziyaoyao.scale.zoomable.zoomable.ensureScale
 import com.origeek.imageViewer.previewer.DEFAULT_CROSS_FADE_ANIMATE_SPEC
 import kotlinx.coroutines.launch
 
@@ -70,6 +71,7 @@ fun ImageComposeOrigin(
     crossfadeAnimationSpec: AnimationSpec<Float> = DEFAULT_CROSS_FADE_ANIMATE_SPEC,
     boundClip: Boolean = true,
 ) {
+    val scale = scale.ensureScale()
     val scope = rememberCoroutineScope()
     // 容器大小
     var bSize by remember { mutableStateOf(IntSize(0, 0)) }

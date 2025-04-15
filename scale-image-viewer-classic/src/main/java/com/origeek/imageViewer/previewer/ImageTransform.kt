@@ -37,6 +37,7 @@ import com.jvziyaoyao.scale.zoomable.previewer.LocalTransformItemStateMap
 import com.jvziyaoyao.scale.zoomable.previewer.TransformItemState
 import com.jvziyaoyao.scale.zoomable.previewer.TransformItemView
 import com.jvziyaoyao.scale.zoomable.previewer.rememberTransformItemState
+import com.jvziyaoyao.scale.zoomable.zoomable.ensureScale
 import com.jvziyaoyao.scale.zoomable.zoomable.zeroOne
 import com.origeek.imageViewer.viewer.commonDeprecatedText
 import kotlinx.coroutines.CoroutineScope
@@ -352,7 +353,7 @@ class TransformContentState(
 
     val fitScale: Float
         get() {
-            return fitSize.width.div(displayRatioSize.width.zeroOne())
+            return fitSize.width.div(displayRatioSize.width.zeroOne()).ensureScale()
         }
 
     val displayRatioSize: Size

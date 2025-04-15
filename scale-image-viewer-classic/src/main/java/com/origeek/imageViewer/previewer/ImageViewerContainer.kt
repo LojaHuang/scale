@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.IntSize
 import com.jvziyaoyao.scale.zoomable.previewer.DEFAULT_SOFT_ANIMATION_SPEC
 import com.jvziyaoyao.scale.zoomable.previewer.LocalTransformItemStateMap
 import com.jvziyaoyao.scale.zoomable.previewer.TransformItemState
+import com.jvziyaoyao.scale.zoomable.zoomable.ensureScale
 import com.origeek.imageViewer.viewer.ImageViewerState
 import com.origeek.imageViewer.viewer.commonDeprecatedText
 import com.origeek.imageViewer.viewer.rememberViewerState
@@ -130,7 +131,7 @@ internal class ViewerContainerState(
      */
     internal suspend fun copyViewerContainerStateToTransformState() {
         transformState.apply {
-            val targetScale = scale.value * fitScale
+            val targetScale = (scale.value * fitScale).ensureScale()
             graphicScaleX.snapTo(targetScale)
             graphicScaleY.snapTo(targetScale)
             val centerOffsetY = (containerSize.height - realSize.height).div(2)
@@ -162,7 +163,7 @@ internal class ViewerContainerState(
             val goOffsetY =
                 (containerSize.height - rh).div(2) + offsetY.value
             // 计算缩放率
-            val fixScale = fitScale * scale.value
+            val fixScale = (fitScale * scale.value).ensureScale()
 
             // 更新值
             graphicScaleX.snapTo(fixScale)
