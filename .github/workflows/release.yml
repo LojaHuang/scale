@@ -7,32 +7,67 @@ on:
 jobs:
   detect-changes:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        # 在此定义所有需要检测的模块
-        module: [ scale-image-viewer, scale-zoomable-view ]
     outputs:
-      ${{ matrix.module }}: ${{ steps.changes.outputs.${{ matrix.module }} }}
+      changed-modules: ${{ steps.set-matrix.outputs.changed-modules }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Get changed files for ${{ matrix.module }}
+      - name: Read module list
+        id: modules
+        run: |
+          MODULES=$(cat .github/modules.json)
+          echo "modules=$MODULES" >> $GITHUB_OUTPUT
+          echo "Modules: $MODULES"
+
+      - name: Generate filters dynamically
+        id: generate-filters
+        run: |
+          MODULES=${{ steps.modules.outputs.modules }}
+          FILTERS=""
+          
+          for module in $(echo "$MODULES" | jq -r '.[]'); do
+            FILTERS="$FILTERS
+            $module:
+              - '$module/**'"
+          done
+          
+          # 移除开头的空行
+          FILTERS=$(echo "$FILTERS" | sed '/^$/d')
+          echo "filters<<EOF" >> $GITHUB_OUTPUT
+          echo "$FILTERS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Detect changes for all modules
         id: changes
         uses: dorny/paths-filter@v2
         with:
-          filters: |
-            ${{ matrix.module }}:
-              - '${{ matrix.module }}/**'
+          filters: ${{ steps.generate-filters.outputs.filters }}
+
+      - name: Create dynamic matrix
+        id: set-matrix
+        run: |
+          CHANGED_MODULES=()
+          MODULES=${{ steps.modules.outputs.modules }}
+          
+          for module in $(echo "$MODULES" | jq -r '.[]'); do
+            if [[ "${{ steps.changes.outputs.$module }}" == "true" ]]; then
+              CHANGED_MODULES+=("\"$module\"")
+            fi
+          done
+          
+          MATRIX_JSON="{\"module\":[$(IFS=,; echo "${CHANGED_MODULES[*]}")]}"
+          echo "changed-modules=$MATRIX_JSON" >> $GITHUB_OUTPUT
+          echo "Modules to build: $MATRIX_JSON"
 
   publish-changed-modules:
     needs: detect-changes
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJSON(needs.detect-changes.outputs.matrix) }}
-    if: contains(needs.detect-changes.outputs.${{ matrix.module }}, 'true')
+      matrix: ${{ fromJson(needs.detect-changes.outputs.changed-modules) }}
+    if: ${{ fromJson(needs.detect-changes.outputs.changed-modules).module[0] }}
 
     steps:
       - name: Checkout code
@@ -50,8 +85,7 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      - name: Publish ${{ matrix.module }} if changed
-        if: needs.detect-changes.outputs.${{ matrix.module }} == 'true'
+      - name: Publish ${{ matrix.module }}
         run: ./gradlew :${{ matrix.module }}:publish
         env:
           GITHUB_PACKAGE_USER: ${{ github.actor }}
