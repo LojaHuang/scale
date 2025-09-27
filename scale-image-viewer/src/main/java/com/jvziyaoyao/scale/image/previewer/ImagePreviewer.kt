@@ -84,6 +84,7 @@ fun ImagePreviewer(
             state.close()
         }
     }
+
     BackHandler(enabled = backEnabled && (state.visible || state.animating || state.visibleTarget == true)) {
         scope.launch {
             if (!state.animating) {

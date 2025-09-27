@@ -172,6 +172,7 @@ open class DraggablePreviewerState(
                         val scale = (containerHeight - offsetY.absoluteValue).div(
                             containerHeight
                         ).ensureScale()
+
                         scope.launch {
                             decorationAlpha.snapTo(scale)
                             draggableContainerState.offsetX.snapTo(offsetX)
