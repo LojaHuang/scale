@@ -12,6 +12,13 @@ dependencyResolutionManagement {
         mavenCentral()
         mavenLocal()
         maven(url = "https://jitpack.io")
+        maven {
+            url = uri("https://maven.pkg.github.com/LojaHuang/scale")
+            credentials {
+                username =  System.getenv("GITHUB_PACKAGE_USER")
+                password =  System.getenv("GITHUB_PACKAGE_TOKEN")
+            }
+        }
     }
 }
 rootProject.name = "scale"

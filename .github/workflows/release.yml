@@ -1,0 +1,58 @@
+name: Smart Module Publishing
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # 在此定义所有需要检测的模块
+        module: [ scale-image-viewer, scale-zoomable-view ]
+    outputs:
+      ${{ matrix.module }}: ${{ steps.changes.outputs.${{ matrix.module }} }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files for ${{ matrix.module }}
+        id: changes
+        uses: dorny/paths-filter@v2
+        with:
+          filters: |
+            ${{ matrix.module }}:
+              - '${{ matrix.module }}/**'
+
+  publish-changed-modules:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJSON(needs.detect-changes.outputs.matrix) }}
+    if: contains(needs.detect-changes.outputs.${{ matrix.module }}, 'true')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Publish ${{ matrix.module }} if changed
+        if: needs.detect-changes.outputs.${{ matrix.module }} == 'true'
+        run: ./gradlew :${{ matrix.module }}:publish
+        env:
+          GITHUB_PACKAGE_USER: ${{ github.actor }}
+          GITHUB_PACKAGE_TOKEN: ${{ secrets.TOKEN }}
