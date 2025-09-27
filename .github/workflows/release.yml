@@ -38,6 +38,8 @@ jobs:
           if [[ "${{ steps.changes.outputs.scale-zoomable-view }}" == "true" ]]; then
             CHANGED_MODULES+=('"scale-zoomable-view"')
           fi
+        
+          # 可以轻松添加更多模块
           
           # 创建动态矩阵
           MATRIX_JSON="{\"module\":[$(IFS=,; echo "${CHANGED_MODULES[*]}")]}"
