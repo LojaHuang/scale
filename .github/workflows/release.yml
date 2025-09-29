@@ -6,7 +6,6 @@ on:
 
 jobs:
   publish-changed-modules:
-    needs: detect-changes
     runs-on: ubuntu-latest
 
     steps:
