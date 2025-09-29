@@ -5,8 +5,11 @@ on:
     branches: [ main ]
 
 jobs:
-  publish-changed-modules:
+  publish:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        module: ['scale-image-viewer', 'scale-zoomable-view']
 
     steps:
       - name: Checkout code
@@ -24,8 +27,8 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      - name: Publish
-        run: ./gradlew publish
+      - name: Publish ${{ matrix.module }}
+        run: ./gradlew :${{ matrix.module }}:publish
         env:
           GITHUB_PACKAGE_USER: ${{ github.actor }}
           GITHUB_PACKAGE_TOKEN: ${{ secrets.TOKEN }}
