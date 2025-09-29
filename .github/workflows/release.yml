@@ -5,54 +5,9 @@ on:
     branches: [ main ]
 
 jobs:
-  detect-changes:
-    runs-on: ubuntu-latest
-    outputs:
-      changed-modules: ${{ steps.set-matrix.outputs.changed-modules }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Detect changes for all modules
-        id: changes
-        uses: dorny/paths-filter@v2
-        with:
-          filters: |
-            scale-image-viewer:
-              - 'scale-image-viewer/**'
-            scale-zoomable-view:
-              - 'scale-zoomable-view/**'
-            # 可以轻松添加更多模块
-
-      - name: Create dynamic matrix
-        id: set-matrix
-        run: |
-          CHANGED_MODULES=()
-          
-          if [[ "${{ steps.changes.outputs.scale-image-viewer }}" == "true" ]]; then
-            CHANGED_MODULES+=('"scale-image-viewer"')
-          fi
-          
-          if [[ "${{ steps.changes.outputs.scale-zoomable-view }}" == "true" ]]; then
-            CHANGED_MODULES+=('"scale-zoomable-view"')
-          fi
-        
-          # 可以轻松添加更多模块
-          
-          # 创建动态矩阵
-          MATRIX_JSON="{\"module\":[$(IFS=,; echo "${CHANGED_MODULES[*]}")]}"
-          echo "changed-modules=$MATRIX_JSON" >> $GITHUB_OUTPUT
-          echo "Modules to build: $MATRIX_JSON"
-
   publish-changed-modules:
     needs: detect-changes
     runs-on: ubuntu-latest
-    strategy:
-      matrix: ${{ fromJson(needs.detect-changes.outputs.changed-modules) }}
-    # 如果没有变更的模块，跳过整个 job
-    if: ${{ fromJson(needs.detect-changes.outputs.changed-modules).module[0] }}
 
     steps:
       - name: Checkout code
@@ -70,8 +25,8 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      - name: Publish ${{ matrix.module }}
-        run: ./gradlew :${{ matrix.module }}:publish
+      - name: Publish
+        run: ./gradlew publish
         env:
           GITHUB_PACKAGE_USER: ${{ github.actor }}
           GITHUB_PACKAGE_TOKEN: ${{ secrets.TOKEN }}
