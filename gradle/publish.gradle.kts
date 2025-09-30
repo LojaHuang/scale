@@ -10,7 +10,7 @@ plugins.withId("com.android.library") {
                 repositories {
                     maven {
                         name = "GitHubPackages"
-                        url = uri("https://maven.pkg.github.com/LojaHuang/scale")
+                        url = uri("https://maven.pkg.github.com/LojaHuang")
                         credentials {
                             username = System.getenv("GITHUB_PACKAGE_USER")
                             password = System.getenv("GITHUB_PACKAGE_TOKEN")
