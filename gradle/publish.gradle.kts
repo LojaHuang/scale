@@ -10,7 +10,7 @@ plugins.withId("com.android.library") {
                 repositories {
                     maven {
                         name = "GitHubPackages"
-                        url = uri("https://maven.pkg.github.com/LojaHuang")
+                        url = uri("https://maven.pkg.github.com/LojaHuang/nf-chat-core")
                         credentials {
                             username = System.getenv("GITHUB_PACKAGE_USER")
                             password = System.getenv("GITHUB_PACKAGE_TOKEN")
